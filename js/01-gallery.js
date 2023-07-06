@@ -1,35 +1,47 @@
 import { galleryItems } from "./gallery-items.js";
 // Change code below this line
 
-const galleryMarkup = galleryItems.map((image, index) => {
-  return `<li class="gallery__item"><a class="gallery__link" data-source="${image.original}" href="${image.original}"><img data-index="${index}" class="gallery__image" src="${image.preview}" alt="${image.description}"></a></li>`;
-});
-
-const galleryTemplate = `${galleryMarkup.join("")}`;
-
+//Знаходимо селектор gallery
 const galleryList = document.querySelector(".gallery");
-galleryList.insertAdjacentHTML("beforeend", galleryTemplate);
 
-galleryList.addEventListener("click", showOriginalImage);
+//Формуємо розмітку
+const galleryListMarkup = galleryItems
+  .map(({ preview, original, description }) => {
+    return `<li class="gallery__item">
+        <a class="gallery__link" href="${original}">
+    <img
+      class="gallery__image"
+      src="${preview}"
+      data-source="${original}"
+      alt="${description}"
+    />
+  </a>
+    </li>`;
+  })
+  .join("");
 
-function showOriginalImage(event) {
-  //event.preventDafault();
-  if (event.target.nodeName !== "IMG") {
+//Додаємо розмітку фотогалереї на сайт
+galleryList.insertAdjacentHTML("afterbegin", galleryListMarkup);
+
+galleryList.addEventListener("click", onGalleryListClick);
+
+function onGalleryListClick(event) {
+  event.preventDefault();
+
+  if (!event.target.classList.contains("gallery__image")) {
     return;
   }
 
-  const selectedImage = event.target.dataset.index;
-  const sourceImage = event.target.dataset.source;
-  console.log(selectedImage);
-  console.log(sourceImage);
-
   const instance = basicLightbox.create(`
-    <div class="modal">
-    <img data-index="${selectedImage}" src="${sourceImage}">
-    </div>
-`);
+    <img src="${event.target.dataset.source}" alt="${event.target.alt}" class="gallery__size">`);
 
   instance.show();
-}
+  document.addEventListener("keydown", onEscPress);
 
-// console.log(instance);
+  function onEscPress(event) {
+    if (event.code === "Escape") {
+      instance.close();
+      document.removeEventListener("keydown", onEscPress);
+    }
+  }
+}

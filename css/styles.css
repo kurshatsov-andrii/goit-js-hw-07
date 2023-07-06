@@ -42,3 +42,8 @@
 .gallery__link:hover {
   cursor: zoom-in;
 }
+
+.gallery__size {
+width: 800px;
+height: 600px;
+}
